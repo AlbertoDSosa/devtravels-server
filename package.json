@@ -2,14 +2,30 @@
   "name": "destravel",
   "version": "0.0.1",
   "description": "Aplicación de Viajes",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "export NODE_ENV=production || NODE_ENV= production || SET \"NODE_ENV=production\" && node server/",
+    "server-dev": "export NODE_ENV=development || NODE_ENV=development || SET \"NODE_ENV=development\" && nodemon --inspect server/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlbertoDSosa/destravel.git"
   },
   "keywords": [
     "Travel",
     "Trips"
   ],
   "author": "Alberto D.Sosa <albertodsosa@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^3.0.5",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "mongoose": "^5.4.22",
+    "validator": "^10.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
 }
