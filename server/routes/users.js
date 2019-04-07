@@ -21,13 +21,23 @@ router.post('/singup', (req, res) => {
 });
 
 // Login de usuario
-router.post('/singin', (req, res) => {
-  res.send(req.url);
+router.post('/singin', async (req, res) => {
+  try {
+    const user = await User.findByCredentials(req.body);
+    const token = await user.createAuthToken();
+    
+    res.status(200).send({
+      data: user,
+      message: 'You have logged in correctly'
+    });
+  } catch(err) {
+    res.status(err.status).send(err.message);
+  }
 });
 
-// Trae un usuario por id
+// Trae un usuario por id(Ruta Protegida)
 router.get('/:id', (req, res) => {
   res.send(req.url);
-})
+});
 
 module.exports = router;

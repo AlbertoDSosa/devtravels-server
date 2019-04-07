@@ -5,6 +5,7 @@ const validator = require('validator');
 const validate = require('./validate');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -44,7 +45,17 @@ const UserSchema = new mongoose.Schema({
         return 'The password must contain: Uppercase, lowercase, numbers and special characters such as $';
       }
     }
-  }
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String,
+      required: true
+    }
+  }]
 });
 
 UserSchema.methods.toJSON = function () {
@@ -65,6 +76,47 @@ UserSchema.pre('save', function (next) {
     next();
   }
 });
+
+UserSchema.methods.createAuthToken = function () {
+  const user = this;
+ 
+  const token = jwt.sign({
+      _id: user._id
+  }, process.env.JWT_SECRET);
+
+  user.tokens.push({
+    token,
+    type: 'auth'
+  });
+
+  return user.save()
+    .then(dbUser => {
+      return token;
+    });
+}
+
+UserSchema.statics.findByCredentials = async (user) => {
+  // Filtros de validación
+  user = validate.isObject(user);
+  user = validate.isEmpty(user);
+  user = validate.hasProperties(user, ['email', 'password']);
+  user = validate.isEmail(user);
+
+  // Verificación de el email
+  const dbUser = await User.findOne({email: user.email});
+  
+  if(!dbUser) {
+    throw {
+      status: 401,
+      message: `The email |${user.email}| does not match`
+    } 
+  }
+  
+  // Verificación de la contraseña
+  await validate.comparePass(user.password, dbUser.password);
+  
+  return dbUser;
+}
 
 const User = mongoose.model('user', UserSchema);
 
