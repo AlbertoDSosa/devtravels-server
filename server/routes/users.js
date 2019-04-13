@@ -1,7 +1,9 @@
 'use strict';
 
 const router = require('express').Router();
-const User = require('../models/user/User');
+const User = require('../models/User');
+const validate = require('../middlewares/validate-req');
+const {auth} = require('../middlewares/auth-user');
 
 // Trae todos los usuarios (Ruta protegida)
 router.get('/all', (req, res) => {
@@ -21,22 +23,46 @@ router.post('/singup', (req, res) => {
 });
 
 // Login de usuario
-router.post('/singin', async (req, res) => {
+
+const singInOpts = {
+  type: 'object',
+  props: ['email', 'password']
+}
+router.post('/singin', validate(singInOpts), async (req, res) => {
   try {
     const user = await User.findByCredentials(req.body);
     const token = await user.createAuthToken();
     
-    res.status(200).send({
+    res.header('Authorization', token).status(200).send({
       data: user,
       message: 'You have logged in correctly'
     });
   } catch(err) {
-    res.status(err.status).send(err.message);
+    res.status(err.status || 500).send(err.message || err);
   }
 });
 
-// Trae un usuario por id(Ruta Protegida)
-router.get('/:id', (req, res) => {
+// Trae el usuario autenticado en este momento.
+router.get('/me', auth, (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch(err) {
+    res.status(403).send(err);
+  }
+
+});
+
+// Actualizo mi usuario.
+router.put('/update', auth, (req, res) => {
+  res.send(req.url);
+});
+
+router.patch('/update-pass', auth, (req, res) => {
+  res.send(req.url);
+});
+
+router.delete('/delete', auth, (req, res) => { 
   res.send(req.url);
 });
 

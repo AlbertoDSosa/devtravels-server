@@ -1,41 +1,7 @@
 'use strict';
 
-// Validaciones de el objeto req.body
-
-const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const isObject = (user) => {
-  if(_.isArray(user)){
-    throw {
-      status: 400,
-      meassage: 'The request shold be a object {}'
-    };
-  }
-  return user;
-}
-
-const isEmpty = (user) => {
-  if(_.isEmpty(user)) {
-    throw {
-      status: 400,
-      message: 'The request object is empty'
-    };
-  }
-  return user;
-}
-
-const hasProperties = (user, props) => {
-  for(let value of props) {
-    if(!_.has(user, value)) {
-      throw {
-        status: 400,
-        message: `The request object should has the property ${value}`
-      };
-    }
-  }
-  return user;
-}
 
 const passwordRules = (password) => {
   return  password.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)/) ? true : false;
@@ -66,8 +32,5 @@ const isEmail = (user) => {
 module.exports = {
   passwordRules,
   comparePass,
-  isObject,
-  isEmpty,
-  hasProperties,
   isEmail
 }

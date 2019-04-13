@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const validator = require('validator');
-const validate = require('./validate');
+const validate = require('../helpers/validate-user');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
@@ -14,7 +14,6 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     maxlength: 100,
     validate: {
-      isAsync: true,
       validator: (email) => {
         return validator.isEmail(email);
       },
@@ -37,7 +36,6 @@ const UserSchema = new mongoose.Schema({
     minlength: [8, 'The password shold have 8 characters or more'],
     maxlength: 128,
     validate: {
-      isAsync: true,
       validator: (password) => {
         return validate.passwordRules(password);
       },
@@ -55,7 +53,11 @@ const UserSchema = new mongoose.Schema({
       type: String,
       required: true
     }
-  }]
+  }],
+  role: {
+    type: String,
+    default: 'user'
+  }
 });
 
 UserSchema.methods.toJSON = function () {
@@ -81,7 +83,8 @@ UserSchema.methods.createAuthToken = function () {
   const user = this;
  
   const token = jwt.sign({
-      _id: user._id
+      _id: user._id,
+      exp: (Date.now() / 1000) + 60
   }, process.env.JWT_SECRET);
 
   user.tokens.push({
@@ -96,10 +99,8 @@ UserSchema.methods.createAuthToken = function () {
 }
 
 UserSchema.statics.findByCredentials = async (user) => {
+
   // Filtros de validación
-  user = validate.isObject(user);
-  user = validate.isEmpty(user);
-  user = validate.hasProperties(user, ['email', 'password']);
   user = validate.isEmail(user);
 
   // Verificación de el email

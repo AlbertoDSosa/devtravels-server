@@ -11,7 +11,8 @@ const ENV = process.env.NODE_ENV || enviroments.development;
 
 const config = {
   [enviroments.production]: {
-    PORT: 80
+    PORT: 80,
+    JWT_SECRET: 'ultrasecret'
   },
   [enviroments.development]: {
     PORT: 8080,
