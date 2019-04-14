@@ -10,16 +10,16 @@ router.get('/all', (req, res) => {
   res.send(req.url);
 });
 
-router.get('/:id', (req, res) => {
+router.get('/', (req, res) => {
   res.send(req.url);
 });
 
 
-router.put('/:id', (req, res)=> {
+router.put('/', (req, res)=> {
   res.send(req.url);
 });
 
-router.delete('/:id', (req, res)=> { 
+router.delete('/', (req, res)=> { 
   res.send(req.url);
 });
 

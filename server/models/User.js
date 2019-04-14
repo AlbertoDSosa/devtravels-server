@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema({
     maxlength: 100,
     validate: {
       validator: (email) => {
+        console.log('validando email');
         return validator.isEmail(email);
       },
       message: (props) => {
@@ -57,12 +58,16 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'user'
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
 UserSchema.methods.toJSON = function () {
   const user = this;
-  return _.pick(user, ['username', 'email', '_id']);
+  return _.pick(user, ['username', 'email', '_id', 'updatedAt']);
 }
 
 UserSchema.pre('save', function (next) {
@@ -79,12 +84,30 @@ UserSchema.pre('save', function (next) {
   }
 });
 
+
+UserSchema.pre('updateOne', function (next) {
+  const user = this;
+
+  
+  if(user._update.password) {
+    bcrypt.hash(user._update.password, 10)
+    .then(hash => {
+      user._update.password = hash
+      user.updateOne({}, { updatedAt: Date.now() });
+      next();
+    });
+  } else {
+    user.updateOne({}, { updatedAt: Date.now() });
+    next();
+  }
+});
+
 UserSchema.methods.createAuthToken = function () {
   const user = this;
  
   const token = jwt.sign({
       _id: user._id,
-      exp: (Date.now() / 1000) + 60
+      // exp: (Date.now() / 1000) + 60
   }, process.env.JWT_SECRET);
 
   user.tokens.push({
@@ -100,9 +123,6 @@ UserSchema.methods.createAuthToken = function () {
 
 UserSchema.statics.findByCredentials = async (user) => {
 
-  // Filtros de validación
-  user = validate.isEmail(user);
-
   // Verificación de el email
   const dbUser = await User.findOne({email: user.email});
   
@@ -117,6 +137,18 @@ UserSchema.statics.findByCredentials = async (user) => {
   await validate.comparePass(user.password, dbUser.password);
   
   return dbUser;
+}
+
+UserSchema.statics.updatePass = async (user, body) => {
+  const {newPass, oldPass} = body;
+
+  await validate.comparePass(oldPass, user.password);
+
+  if(!validate.passwordRules(newPass)){
+    throw 'The password must contain: Uppercase, lowercase, numbers and special characters such as $';
+  }
+
+  await User.updateOne({_id: user._id},{password: newPass});
 }
 
 const User = mongoose.model('user', UserSchema);

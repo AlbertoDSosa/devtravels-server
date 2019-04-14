@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 const TripSchema = new mongoose.Schema({
-  trip: {
+  tripname: {
     type: String,
     required: true
   },
@@ -21,6 +21,10 @@ const TripSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true
+  },
+  updateAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

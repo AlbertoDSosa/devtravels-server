@@ -54,16 +54,43 @@ router.get('/me', auth, (req, res) => {
 });
 
 // Actualizo mi usuario.
-router.put('/update', auth, (req, res) => {
-  res.send(req.url);
+const updateUserOpts = {
+  type: 'object',
+  props: ['username', 'email']
+}
+router.put('/update', auth, validate(updateUserOpts), async (req, res) => {
+  try {
+    await req.user.updateOne(req.body, { runValidators: true });
+    res.status(200).send(await User.findById(req.user._id));
+  } catch(err) {
+    res.status(400).send(err.message || err);
+  }
 });
 
-router.patch('/update-pass', auth, (req, res) => {
-  res.send(req.url);
+const updatePassOpts = {
+  type: 'object',
+  props: ['oldPass', 'newPass']
+}
+
+router.patch('/update-pass',
+  auth, 
+  validate(updatePassOpts),
+  async (req, res) => {
+    try {
+      await User.updatePass(req.user, req.body); 
+      res.status(200).send('Password updated successfully');
+    } catch(err) {
+      res.status(err.status || 400).send(err.message || err);
+    }
 });
 
-router.delete('/delete', auth, (req, res) => { 
-  res.send(req.url);
+router.delete('/delete', auth, async (req, res) => { 
+  try {
+    const user = await User.findByIdAndDelete(req.user._id);
+    res.status(200).send(user);
+  } catch(err) {
+    res.status(500).send(err);
+  }
 });
 
 module.exports = router;
