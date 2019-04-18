@@ -15,7 +15,6 @@ const UserSchema = new mongoose.Schema({
     maxlength: 100,
     validate: {
       validator: (email) => {
-        console.log('validando email');
         return validator.isEmail(email);
       },
       message: (props) => {
@@ -57,6 +56,7 @@ const UserSchema = new mongoose.Schema({
   }],
   role: {
     type: String,
+    enum: ['user', 'admin', 'root'],
     default: 'user'
   },
   updatedAt: {
@@ -84,18 +84,16 @@ UserSchema.pre('save', function (next) {
   }
 });
 
-
 UserSchema.pre('updateOne', function (next) {
   const user = this;
 
-  
   if(user._update.password) {
     bcrypt.hash(user._update.password, 10)
-    .then(hash => {
-      user._update.password = hash
-      user.updateOne({}, { updatedAt: Date.now() });
-      next();
-    });
+      .then(hash => {
+        user._update.password = hash
+        user.updateOne({}, { updatedAt: Date.now() });
+        next();
+      });
   } else {
     user.updateOne({}, { updatedAt: Date.now() });
     next();
@@ -110,6 +108,7 @@ UserSchema.methods.createAuthToken = function () {
       // exp: (Date.now() / 1000) + 60
   }, process.env.JWT_SECRET);
 
+  // pendiente de mejora
   user.tokens.push({
     token,
     type: 'auth'
@@ -139,16 +138,17 @@ UserSchema.statics.findByCredentials = async (user) => {
   return dbUser;
 }
 
-UserSchema.statics.updatePass = async (user, body) => {
+UserSchema.methods.updatePass = async function (body) {
   const {newPass, oldPass} = body;
-
+  const user = this;
+  
   await validate.comparePass(oldPass, user.password);
 
-  if(!validate.passwordRules(newPass)){
+  if(!validate.passwordRules(newPass)) {
     throw 'The password must contain: Uppercase, lowercase, numbers and special characters such as $';
   }
 
-  await User.updateOne({_id: user._id},{password: newPass});
+  await user.updateOne({password: newPass});
 }
 
 const User = mongoose.model('user', UserSchema);

@@ -3,7 +3,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const validate = require('../middlewares/validate-req');
-const {auth} = require('../middlewares/auth-user');
+const {auth, isAdmin} = require('../middlewares/auth-user');
 
 // Trae todos los usuarios (Ruta protegida)
 router.get('/all', (req, res) => {
@@ -50,7 +50,6 @@ router.get('/me', auth, (req, res) => {
   } catch(err) {
     res.status(403).send(err);
   }
-
 });
 
 // Actualizo mi usuario.
@@ -77,7 +76,7 @@ router.patch('/update-pass',
   validate(updatePassOpts),
   async (req, res) => {
     try {
-      await User.updatePass(req.user, req.body); 
+      await req.user.updatePass(req.body); 
       res.status(200).send('Password updated successfully');
     } catch(err) {
       res.status(err.status || 400).send(err.message || err);
