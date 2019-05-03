@@ -3,9 +3,14 @@
 require('./config')
 const express = require('express');
 const server = express();
+const cors = require('cors');
 
 const PORT = process.env.PORT || 3030;
 
+server.use(cors({
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: 'Authorization'
+}));
 server.use(express.json());
 server.use((err, req, res, next) => {
   if (err) {

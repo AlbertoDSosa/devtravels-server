@@ -14,11 +14,20 @@ router.get('/all', (req, res) => {
 router.post('/singup', (req, res) => {
   new User(req.body).save()
     .then(user => {
-      res.send(user);
+      res
+        .status(201)
+        .send({
+          message: 'You have registrered correctly',
+          status: 201,
+          user
+        });
     })
     .catch(err => {
-      err = err.message || err.errmsg;
-      res.status(400).send(err);
+      res.status(400).send({
+        status: 400,
+        message: err.message || err.errmsg,
+        err: true
+      });
     });
 });
 
@@ -33,12 +42,19 @@ router.post('/singin', validate(singInOpts), async (req, res) => {
     const user = await User.findByCredentials(req.body);
     const token = await user.createAuthToken();
     
-    res.header('Authorization', token).status(200).send({
-      data: user,
-      message: 'You have logged in correctly'
-    });
+    res
+      .header('Authorization', token)
+      .status(200)
+      .send({
+        user,
+        message: 'You have logged in correctly',
+        status:200
+      });
   } catch(err) {
-    res.status(err.status || 500).send(err.message || err);
+    res.status(err.status || 500).send({
+      message: err.message || err.errmsg || err,
+      err: true
+    });
   }
 });
 
