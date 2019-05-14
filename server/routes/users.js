@@ -18,15 +18,13 @@ router.post('/singup', (req, res) => {
         .status(201)
         .send({
           message: 'You have registrered correctly',
-          status: 201,
-          user
+          status: 201
         });
     })
     .catch(err => {
       res.status(400).send({
         status: 400,
-        message: err.message || err.errmsg,
-        err: true
+        message: err.message || err.errmsg
       });
     });
 });
@@ -52,8 +50,7 @@ router.post('/singin', validate(singInOpts), async (req, res) => {
       });
   } catch(err) {
     res.status(err.status || 500).send({
-      message: err.message || err.errmsg || err,
-      err: true
+      message: err.message || err.errmsg || err
     });
   }
 });

@@ -23,6 +23,10 @@ server.use((err, req, res, next) => {
 
 server.use(require('./routes'));
 
-server.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`)
-});
+if(process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+      console.log(`Server listening at http://localhost:${PORT}/`);
+  });
+}
+
+module.exports = server;

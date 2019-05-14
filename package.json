@@ -4,7 +4,8 @@
   "description": "Aplicación de Viajes",
   "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "export NODE_ENV=test || NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec yarn test",
     "start": "export NODE_ENV=production || NODE_ENV= production || SET \"NODE_ENV=production\" && node server/",
     "server-dev": "export NODE_ENV=development || NODE_ENV=development || SET \"NODE_ENV=development\" && nodemon --inspect server/"
   },
@@ -30,6 +31,10 @@
     "validator": "^10.11.0"
   },
   "devDependencies": {
-    "nodemon": "^1.18.10"
+    "casual": "^1.6.0",
+    "expect": "^24.8.0",
+    "mocha": "^6.1.4",
+    "nodemon": "^1.18.10",
+    "supertest": "^4.0.2"
   }
 }

@@ -2,14 +2,12 @@
 
 const mongoose = require('mongoose');
 
-const env = process.env.NODE_ENV;
-
-const dbName = env === 'development' ? 'devtravel': 'destravel';
+const { HOST, PORT, DB } = process.env.MongoDB;
 
 mongoose
-  .connect(`mongodb://localhost:27017/${dbName}`, { useNewUrlParser: true })
+  .connect(`mongodb://${HOST}:${PORT}/${DB}`, { useNewUrlParser: true })
   .then((connection) => {
-    console.log(`Mongo ${dbName} database running...`);
+    console.log(`Mongo ${DB} database running...`);
   })
   .catch(console.log);
 

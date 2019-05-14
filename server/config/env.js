@@ -2,21 +2,41 @@
 
 console.log('NODE_ENV =', process.env.NODE_ENV);
 
-const enviroments = {
+const environments = {
   "production": "production",
-  "development": "development"
+  "development": "development",
+  "test": "test"
 }
 
-const ENV = process.env.NODE_ENV || enviroments.development;
+const ENV = process.env.NODE_ENV || environments.development;
 
 const config = {
-  [enviroments.production]: {
+  [environments.production]: {
     PORT: 80,
-    JWT_SECRET: 'ultrasecret'
+    JWT_SECRET: 'ultrasecret',
+    MongoDB: {
+      HOST: 'localhost',
+      PORT: 27017,
+      DB: 'devtravel'
+    }
   },
-  [enviroments.development]: {
+  [environments.development]: {
     PORT: 8080,
-    JWT_SECRET: `ultrasecret`
+    JWT_SECRET: `ultrasecret`,
+    MongoDB: {
+      HOST: 'devtravels_db',
+      PORT: 27017,
+      DB: 'devtravel_dev'
+    }
+  },
+  [environments.test]: {
+    PORT: 5050,
+    JWT_SECRET: `ultrasecret`,
+    MongoDB: {
+        HOST: 'localhost',
+        PORT: 27017,
+        DB: 'devtravel_test'
+    }
   }
 };
 
