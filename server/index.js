@@ -11,6 +11,7 @@ server.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: 'Authorization'
 }));
+
 server.use(express.json());
 server.use((err, req, res, next) => {
   if (err) {

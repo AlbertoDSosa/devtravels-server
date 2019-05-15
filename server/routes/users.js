@@ -3,7 +3,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const validate = require('../middlewares/validate-req');
-const {auth, isAdmin} = require('../middlewares/auth-user');
+const {auth} = require('../middlewares/auth-user');
 
 // Trae todos los usuarios (Ruta protegida)
 router.get('/all', (req, res) => {

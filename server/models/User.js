@@ -6,6 +6,7 @@ const validate = require('../helpers/validate-user');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+const Profile = require('./Profile');
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -84,6 +85,11 @@ UserSchema.pre('save', function (next) {
   }
 });
 
+UserSchema.post('save', function (next) {
+  const user = this;
+  new Profile({user_id: user._id}).save();
+});
+
 UserSchema.pre('updateOne', function (next) {
   const user = this;
 
@@ -109,15 +115,17 @@ UserSchema.methods.createAuthToken = function () {
   }, process.env.JWT_SECRET);
 
   // pendiente de mejora
-  user.tokens.push({
-    token,
-    type: 'auth'
-  });
+  // user.tokens.push({
+  //   token,
+  //   type: 'auth'
+  // });
 
-  return user.save()
-    .then(dbUser => {
-      return token;
-    });
+  return user
+          .update({tokens: [...user.tokens, {
+            token,
+            type: 'auth'
+          }]})
+          .then(res => token)
 }
 
 UserSchema.statics.findByCredentials = async (user) => {
