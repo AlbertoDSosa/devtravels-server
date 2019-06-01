@@ -46,15 +46,17 @@ const auth = async (req, res, next) => {
   }
 }
 
-const isAdmin = (req, res, next) => {
-  if(req.user.role === 'admin') {
-    return next();
+const hasRole = (role) => {
+  return (req, res, next) => {
+    if(req.user.role === role) {
+      return next();
+    }
+  
+    res.status(403).send({message: `Rute only for ${role} user`});
   }
-
-  res.status(403).send('Rute only for user admins');
 }
 
 module.exports = {
   auth,
-  isAdmin
+  hasRole
 }

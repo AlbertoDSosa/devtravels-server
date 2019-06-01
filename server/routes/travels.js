@@ -2,7 +2,7 @@
 
 const router = require('express').Router();
 const Travel = require('../models/Travel');
-const { auth, isAdmin } = require('../middlewares/auth-user');
+const { auth, hasRole } = require('../middlewares/auth-user');
 const validate = require('../middlewares/validate-req');
 const multer = require('../config/multer');
 const path = require('path');

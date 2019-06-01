@@ -49,8 +49,6 @@ TravelSchema.statics.findByUri = async (uri) => {
   return travel;
 }
 
-
-
 const Travel = mongoose.model('travel', TravelSchema);
 
 module.exports = Travel;
