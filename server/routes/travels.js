@@ -7,7 +7,7 @@ const validate = require('../middlewares/validate-req');
 const multer = require('../config/multer');
 const path = require('path');
 
-router.post('/add', async (req, res) => {
+router.post('/add', auth, hasRole('admin'), async (req, res) => {
   try {
     const travel = await new Travel(req.body).save()
     res.status(201).send({
@@ -19,8 +19,18 @@ router.post('/add', async (req, res) => {
   }
 });
 
-router.get('/all', (req, res) => {
+router.get('/dasboard/travels',auth, hasRole('admin'), (req, res) => {
   Travel.find({})
+    .then(travels => {
+      res.status(200).send(travels);
+    })
+    .catch(err => {
+      res.send(err);
+    });
+});
+
+router.get('/all', (req, res) => {
+  Travel.findForHome()
     .then(travels => {
       res.status(200).send(travels);
     })
@@ -29,11 +39,19 @@ router.get('/all', (req, res) => {
     })
 });
 
-router.post('/upload-img/:uri', multer.single('file'), async (req, res) => {
+router.post('/upload-img/:uri',
+    multer.single('file'),
+    auth, hasRole('admin'),
+    async (req, res) => {
+  
   const uri = req.params.uri;
   
   try {
-    const travel = await Travel.findOneAndUpdate({uri}, {image: req.file.originalname});
+    const travel = await Travel.findOneAndUpdate(
+                                    {uri},
+                                    {image: req.file.originalname}
+                                  );
+
     res.status(200).send({
       message: 'Image upload successfully',
       travel
@@ -43,12 +61,12 @@ router.post('/upload-img/:uri', multer.single('file'), async (req, res) => {
   }
 });
 
-router.patch('/update/:uri', (req, res) => {
+router.patch('/update/:uri', auth, hasRole('admin'), (req, res) => {
   const uri = req.params.uri;
   res.send(req.url);
 });
 
-router.delete('/delete/:uri', (req, res) => { 
+router.delete('/delete/:uri', auth, hasRole('admin'), (req, res) => { 
   const uri = req.params.uri;
   Travel.findOneAndDelete({uri})
     .then(travel => {
@@ -62,7 +80,7 @@ router.delete('/delete/:uri', (req, res) => {
     });
 });
 
-router.get('/image/:uri', async (req, res) => {
+router.get('/image/:uri', auth, hasRole('admin'), async (req, res) => {
   const uri = req.params.uri;
   
   try {
@@ -73,7 +91,7 @@ router.get('/image/:uri', async (req, res) => {
   }
 });
 
-router.get('/:uri', async (req, res) => {
+router.get('/:uri', auth, hasRole('admin'), async (req, res) => {
   const uri = req.params.uri;
   
   try {

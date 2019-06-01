@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const _ = require('lodash');
 
 const TravelSchema = new mongoose.Schema({
   travelname: {
@@ -38,17 +39,34 @@ const TravelSchema = new mongoose.Schema({
   }
 });
 
-TravelSchema.statics.findByUri = async (uri) => {
-  const travel = await Travel.findOne({uri});
-  if(!travel) {
-    throw {
-      status: 400,
-      message: `The ${uri} uri does not exist`
-    }
-  }
-  return travel;
-}
 
+TravelSchema.statics.findForHome = async () => {
+  const travels = await Travel.find({});
+  return travels.map(travel => {
+    return _.pick(travel, [
+        '_id',
+        'uri',
+        'price',
+        'travelname',
+        'image',
+        'date',
+        'description'
+      ])
+  });
+}
+  
+  TravelSchema.statics.findByUri = async (uri) => {
+    const travel = await Travel.findOne({uri});
+    if(!travel) {
+      throw {
+        status: 400,
+        message: `The ${uri} uri does not exist`
+      }
+    }
+
+    return travel;
+  }
+  
 const Travel = mongoose.model('travel', TravelSchema);
 
 module.exports = Travel;
