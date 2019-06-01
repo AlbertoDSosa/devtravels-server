@@ -24,7 +24,7 @@ const config = {
     PORT: 8080,
     JWT_SECRET: `ultrasecret`,
     MongoDB: {
-      HOST: 'devtravels_db',
+      HOST: 'localhost',
       PORT: 27017,
       DB: 'devtravel_dev'
     }
