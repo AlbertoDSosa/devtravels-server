@@ -28,7 +28,7 @@
     "mongoose": "^5.4.22",
     "multer": "^1.4.1",
     "validate": "^4.5.1",
-    "validator": "^10.11.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "casual": "^1.6.0",
